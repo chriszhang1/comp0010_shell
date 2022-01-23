@@ -1,0 +1,7 @@
+nose2
+nose
+lark
+coverage
+flake8-html
+junit2html
+hypothesis

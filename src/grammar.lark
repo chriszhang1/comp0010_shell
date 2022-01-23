@@ -1,0 +1,58 @@
+start: pipe | seq | atomic | rdr
+
+pipe: atomic "|" atomic
+    | pipe "|" atomic
+
+seq: start ";" start
+
+atomic: WS* ( sub ) ( WS+ arg )* WS*
+    | WS* CMD ( WS+ arg )* WS*
+
+arg: ( quoted | UNQUOTED )+
+
+quoted: "'" SQC "'"
+    | QUOTE_MARK ( sub | DQC )* QUOTE_MARK
+    | sub
+
+sub: BQM start2 BQM 
+
+rdr: WS* redirection* CMD ( WS+ arg )* ( WS+ redirection )* WS*
+
+redirection: rdr_in | rdr_out
+
+rdr_in: "<" WS* arg WS* 
+
+rdr_out: ">" WS* arg WS*
+
+
+start2: pipe2 | seq2 | atomic2 | rdr2
+
+pipe2: atomic2 "|" atomic2
+    | pipe2 "|" atomic2
+
+seq2: start2 ";" start2
+
+atomic2: WS* CMD ( WS+ arg2 )* WS*
+
+arg2: ( quoted2 | UNQUOTED )+
+
+quoted2: "'" SQC "'"
+    | QUOTE_MARK DQC* QUOTE_MARK
+
+rdr2: WS* redirection2* CMD ( WS+ arg2 )* ( WS+ redirection2 )* WS*
+
+redirection2: rdr_in2 | rdr_out2
+
+rdr_in2: "<" WS* arg2 WS* 
+
+rdr_out2: ">" WS* arg2 WS*
+
+
+WS: (" "|/\t/)
+CMD: /[(_)*a-z]+/
+UNQUOTED: /[^\s`"';|<>]+/
+QUOTE_MARK: /"/
+BQM: /`/
+SQC: /[^\n']+/
+BACK: /[^\n`]+/
+DQC: /[^\n"`]+/

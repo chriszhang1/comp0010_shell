@@ -1,0 +1,41 @@
+name: Python test
+
+on: [push]
+
+jobs:
+  test-runner:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Test apps
+      run: |
+        nosetests --with-xunit test/test_apps.py
+
+    - name: Test parser
+      run: |
+        nosetests --with-xunit test/test_parser.py
+
+    - name: Test semantics
+      run: |
+        nosetests --with-xunit test/test_semantics.py
+
+    - name: Run coverage tests 
+      run: |
+        coverage run --branch --omit 'src/appTemplate.py,test/*' -m nose test/test_*.py
+        coverage report
+
+    - name: Run Flake8 tests
+      run: |
+        flake8 --exclude system_test,test
